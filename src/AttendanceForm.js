@@ -1,0 +1,150 @@
+import react, * as React from "react";
+import { Page, Grid } from "tabler-react";
+import SiteWrapper from "./SiteWrapper.react";
+import { Button, Form, FormGroup, Label, Input, Alert } from 'reactstrap';
+import { withFormik } from 'formik';
+
+const AttendanceForm = ({ values, handleChange, handleSubmit, errors, touched, isSubmitting, status }) => {
+  return (
+    <SiteWrapper>
+      <Page.Card
+        title="Employee Attendance Registration"
+      ></Page.Card>
+      <Grid.Col md={6} lg={6} className="align-self-center">
+        {status && status.success && (
+          <Alert color="success">
+            {status.success}
+          </Alert>
+        )}
+        {status && status.error && (
+          <Alert color="danger">
+            {status.error}
+          </Alert>
+        )}
+        <Form onSubmit={handleSubmit}>
+          <FormGroup>
+            {touched.id && errors.id && <p className="red">{errors.id}</p>}
+            <Label for="id">Employee ID</Label>
+            <Input 
+              type="text" 
+              name="id"
+              value={values.id}
+              onChange={handleChange}
+              id="id" 
+              placeholder="Employee ID" 
+            />
+          </FormGroup>
+          <FormGroup>
+            {touched.name && errors.name && <p className="red">{errors.name}</p>}
+            <Label for="name">Employee Name</Label>
+            <Input 
+              type="text" 
+              name="name"
+              value={values.name}
+              onChange={handleChange}
+              id="name" 
+              placeholder="Employee Name" 
+            />
+          </FormGroup>
+          <FormGroup>
+            {touched.status && errors.status && <p className="red">{errors.status}</p>}
+            <Label for="status">Status</Label>
+            <Input type="select" name="status" id="status" value={values.status} onChange={handleChange}>
+              <option value="">Select Status</option>
+              <option value="Present">Present</option>
+              <option value="Absent">Absent</option>
+            </Input>
+          </FormGroup>
+          <FormGroup>
+            {touched.date && errors.date && <p className="red">{errors.date}</p>}
+            <Label for="date">Date</Label>
+            <Input
+              type="date"
+              name="date"
+              id="date"
+              placeholder="Select date"
+              value={values.date} 
+              onChange={handleChange}
+            />
+          </FormGroup>
+          <Button color="primary" disabled={isSubmitting} type="submit">
+            {isSubmitting ? 'Submitting...' : 'Submit'}
+          </Button>
+        </Form>
+      </Grid.Col>
+    </SiteWrapper>
+  );
+}
+
+const FormikApp = withFormik({
+  // Initialize form values properly
+  mapPropsToValues() {
+    return { 
+      id: '',
+      name: '',
+      status: '',
+      date: new Date().toISOString().split('T')[0] // Default to today's date
+    }
+  },
+  
+  // Validate form fields
+  validate(values) {
+    const errors = {};
+    
+    if (!values.id) {
+      errors.id = 'Employee ID is required';
+    }
+    
+    if (!values.name) {
+      errors.name = 'Employee Name is required';
+    }
+    
+    if (!values.status) {
+      errors.status = 'Status is required';
+    }
+    
+    if (!values.date) {
+      errors.date = 'Date is required';
+    }
+    
+    return errors;
+  },
+
+// Handle form submission
+ handleSubmit(values, { props, resetForm, setErrors, setSubmitting, setStatus }) {
+     console.log(JSON.stringify(values));
+    fetch('https://otms.aptgetswag.shop/api/v1/attendance/create', {
+      method: 'POST',
+
+      body: JSON.stringify(values),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(response => {
+      console.log('Response status:', response.status);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      console.log('Success:', data);
+      setStatus({
+        success: `Successfully created attendance record for employee ${values.name} (ID: ${values.id})`
+      });
+      resetForm(); // Clear the form after successful submission
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      setStatus({
+        error: `Failed to create attendance record: ${error.message}`
+      });
+    })
+    .finally(() => {
+      setSubmitting(false);
+    });
+  }
+})(AttendanceForm);
+
+export default FormikApp;

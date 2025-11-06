@@ -15,7 +15,7 @@ class ListSalary extends React.Component {
 
   loadData() {
     // API endpoint updated to use config
-    fetch(`https://otms.aptgetswag.shop/api/v1/salary/search/all`)
+    fetch(`/api/v1/salary/search/all`)
       .then((response) => {
         if (!response.ok) {
           throw new Error("Failed to fetch salary data");

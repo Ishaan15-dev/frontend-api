@@ -113,7 +113,7 @@ const FormikApp = withFormik({
 // Handle form submission
  handleSubmit(values, { props, resetForm, setErrors, setSubmitting, setStatus }) {
      console.log(JSON.stringify(values));
-    fetch('https://otms.aptgetswag.shop/api/v1/attendance/create', {
+    fetch('/api/v1/attendance/create', {
       method: 'POST',
 
       body: JSON.stringify(values),

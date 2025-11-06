@@ -251,7 +251,7 @@ const FormikApp = withFormik({
 
     console.log("Submitting:", JSON.stringify(payload, null, 2));
 
-    fetch('https://otms.aptgetswag.shop/api/v1/employee/create', {
+    fetch('/api/v1/employee/create', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -282,7 +282,7 @@ const FormikApp = withFormik({
         setStatus({ success: true });
         
         // Send notification
-        return fetch('https://otms.aptgetswag.shop/notification/send', {
+        return fetch('/notification/send', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json'

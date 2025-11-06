@@ -162,7 +162,7 @@ const FormikApp = withFormik({
     joining_date: values.joining_date
   };
 
-  fetch('http://13.48.67.195:8080/api/v1/employee/create', {
+  fetch('http://10.0.32.157:8080/api/v1/employee/create', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
@@ -184,7 +184,7 @@ const FormikApp = withFormik({
   });
 
   // (Optional) Secondary notification fetch (if API exists)
-  fetch('http://13.48.67.195:8080/api/v1/notification/send', {
+  fetch('http://10.0.32.157:8080/api/v1/notification/send', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'

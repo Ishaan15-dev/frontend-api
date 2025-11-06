@@ -4,7 +4,7 @@ module.exports = function(app) {
   app.use(
     '/api/v1/employee',
     createProxyMiddleware({
-      target: 'http://localhost:8080',
+      target: 'http://cloud.aptgetswag.shop:8080',
       changeOrigin: true,
     })
   );
@@ -12,7 +12,7 @@ module.exports = function(app) {
   app.use(
     '/api/v1/salary',
     createProxyMiddleware({
-      target: 'http://localhost:8081',
+      target: 'http://cloud.aptgetswag.shop:8080',
       changeOrigin: true,
     })
   );
@@ -20,7 +20,7 @@ module.exports = function(app) {
   app.use(
     '/api/v1/attendance',
     createProxyMiddleware({
-      target: 'http://localhost:5000',
+      target: 'http://cloud.aptgetswag.shop:5001',
       changeOrigin: true,
     })
   );

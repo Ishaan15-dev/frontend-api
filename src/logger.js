@@ -2,12 +2,15 @@ let fs = null;
 let path = null;
 let LOG_FILE = null;
 
+// Check if running in Node (not browser)
 const isNode = typeof window === 'undefined';
 
 if (isNode) {
-  // Node.js environment
-  fs = await import('fs');
-  path = await import('path');
+  // Use eval('require') to avoid bundling 'fs' and 'path' in browser build
+  const nodeRequire = eval('require');
+  fs = nodeRequire('fs');
+  path = nodeRequire('path');
+
   const LOG_DIR = '/var/log/frontend';
   LOG_FILE = path.join(LOG_DIR, 'frontend.log');
 
@@ -47,9 +50,13 @@ const log = (level, message, data = null) => {
   // Always print to console
   (CONSOLE_METHOD[level] || console.log)(logLine);
 
-  // Only write to file in Node environment
+  // Write to file only if Node environment
   if (isNode && fs && LOG_FILE) {
-    fs.appendFileSync(LOG_FILE, logLine + '\n', 'utf8');
+    try {
+      fs.appendFileSync(LOG_FILE, logLine + '\n', 'utf8');
+    } catch (err) {
+      console.error('Failed to write log:', err.message);
+    }
   }
 };
 

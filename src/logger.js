@@ -1,12 +1,19 @@
-import fs from 'fs';
-import path from 'path';
+let fs = null;
+let path = null;
+let LOG_FILE = null;
 
-const LOG_DIR = '/var/log/frontend';
-const LOG_FILE = path.join(LOG_DIR, 'frontend.log');
+const isNode = typeof window === 'undefined';
 
-// Ensure log directory exists
-if (!fs.existsSync(LOG_DIR)) {
-  fs.mkdirSync(LOG_DIR, { recursive: true });
+if (isNode) {
+  // Node.js environment
+  fs = await import('fs');
+  path = await import('path');
+  const LOG_DIR = '/var/log/frontend';
+  LOG_FILE = path.join(LOG_DIR, 'frontend.log');
+
+  if (!fs.existsSync(LOG_DIR)) {
+    fs.mkdirSync(LOG_DIR, { recursive: true });
+  }
 }
 
 const LOG_LEVELS = {
@@ -14,16 +21,15 @@ const LOG_LEVELS = {
   INFO: 'INFO',
   WARN: 'WARN',
   ERROR: 'ERROR',
-  CRITICAL: 'CRITICAL'
+  CRITICAL: 'CRITICAL',
 };
 
-// Map log levels to console methods
 const CONSOLE_METHOD = {
   DEBUG: console.debug,
   INFO: console.info,
   WARN: console.warn,
   ERROR: console.error,
-  CRITICAL: console.error
+  CRITICAL: console.error,
 };
 
 const log = (level, message, data = null) => {
@@ -33,16 +39,18 @@ const log = (level, message, data = null) => {
     level: level,
     job: 'frontend',
     message: message,
-    ...(data ? { data } : {})
+    ...(data ? { data } : {}),
   };
 
   const logLine = JSON.stringify(logObj);
 
-  // Print to console
+  // Always print to console
   (CONSOLE_METHOD[level] || console.log)(logLine);
 
-  // Write same log to file
-  fs.appendFileSync(LOG_FILE, logLine + '\n', 'utf8');
+  // Only write to file in Node environment
+  if (isNode && fs && LOG_FILE) {
+    fs.appendFileSync(LOG_FILE, logLine + '\n', 'utf8');
+  }
 };
 
 export const Logger = {
@@ -50,6 +58,5 @@ export const Logger = {
   info: (msg, data) => log(LOG_LEVELS.INFO, msg, data),
   warn: (msg, data) => log(LOG_LEVELS.WARN, msg, data),
   error: (msg, data) => log(LOG_LEVELS.ERROR, msg, data),
-  critical: (msg, data) => log(LOG_LEVELS.CRITICAL, msg, data)
+  critical: (msg, data) => log(LOG_LEVELS.CRITICAL, msg, data),
 };
-
